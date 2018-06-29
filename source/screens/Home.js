@@ -3,6 +3,13 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet,StatusBar,TouchableOpacity,Alert,AsyncStorage,Button } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import GridView from 'react-native-super-grid';
+
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+  } from 'react-native-admob'
 //import Button from 'react-native-button'
 // create a component
 class Home extends Component {
@@ -30,11 +37,11 @@ class Home extends Component {
             ids:[],
             index:0,
             items :[
-        { name: 'MOVIES ', code: '#ED4C67', id:30, added:false }, { name: 'SPORTS ', code: '#2ecc71', id:17, added:false },
-          { name: 'VIDEOBLOGGING ', code: '#3498db', id:21, added:false  }, { name: 'COMEDY ', code: '#9b59b6', id:23, added:false },
-          { name: 'EDUCATION ', code: '#34495e', id:27, added:false }, { name: 'SCIENCE ', code: '#16a085', id:28, added:false },
-          { name: 'DOCUMENTARY ', code: '#27ae60', id:35, added:false }, { name: 'DRAMA ', code: '#2980b9', id:36, added:false },
-          { name: 'HORROR ', code: '#f1c40f', id:39, added:false }, { name: 'SHOWS ', code: '#e67e22', id:43, added:false },   
+        { name: 'COMEDY ', code: '#ED4C67', id:23, added:false }, { name: 'ENTERTAINMENT ', code: '#2ecc71', id:24, added:false },
+          { name: 'MUSIC ', code: '#3498db', id:10, added:false  }, { name: 'GAMING ', code: '#9b59b6', id:20, added:false },
+          { name: 'SPORTS', code: '#34495e', id:17, added:false }, { name: 'VEHICLES ', code: '#16a085', id:2, added:false },
+          { name: 'PETS ANIMALS ', code: '#27ae60', id:15, added:false }, { name: 'SCIENCE & TECH ', code: '#2980b9', id:28, added:false },
+          { name: 'HOW TOs ', code: '#f1c40f', id:26, added:false }, { name: 'FILM ANIMATION ', code: '#e67e22', id:1, added:false },   
         ],
     
             
@@ -50,23 +57,20 @@ class Home extends Component {
 {
         let array = this.state.items
 
-var objIndex = array.findIndex((obj => obj.id === props));
-if(array[objIndex].added == false){
+    var objIndex = array.findIndex((obj => obj.id === props));
+    if(array[objIndex].added == false){
     array[objIndex].added = true
     var daname = capitalize(array[objIndex].name)
-console.log(daname)
-this.state.list.push(daname)
-this.state.ids.push(array[objIndex].id)
-this.setState({items:array})
+    console.log(daname)
+    this.state.list.push(daname)
+    this.state.ids.push(array[objIndex].id)
+    this.setState({items:array})
 
-}
-else if(array[objIndex].added == true){
+    }
+    else if(array[objIndex].added == true){
     array[objIndex].added = false
     this.state.ids.pop() 
     this.state.list.pop()
-    
-
-
 }
 
 
@@ -162,7 +166,7 @@ async submit(){
       <View>
         {/*<Text style={{color:'#2ed573',alignSelf:'center',fontWeight:"400"}}>{this.state.list}</Text>*/}
           
-          </View>      
+    </View>      
 
     <GridView
          extraData={this.state.index}
@@ -170,14 +174,35 @@ async submit(){
         items={this.state.items}
         style={styles.gridView}
         renderItem={item => (
+          
+          <View style={{borderWidth:0,borderColor:'white',flexDirection:'column'}}>
           <TouchableOpacity  activeOpacity={1.0} style={[styles.itemContainer, { backgroundColor: item.code }]} onPress={()=>this.addList(item.id)}>
+          <View style={{flex:1,flexDirection:'column',borderColor:'red',borderWidth:0,alignItems:'flex-end',}}>
+            <Icon name="done" size={27} color={item.added ?  '#fff' : 'transparent' } />
+            </View>
             <Text style={styles.itemName}>{item.name}</Text>
-
-            <Icon name="done" size={26} color={item.added ?  '#fff' : 'transparent' } />
+            
           </TouchableOpacity>
+          </View>
         )}
       />
-<View style={{flexDirection:'row',}}>
+      <View style={{alignContent:'stretch',alignItems:'stretch',alignSelf:'center'}}>
+  <AdMobBanner
+adSize="smartBannerLandscape"
+  adUnitID="ca-app-pub-9592011956917491/8683582684"
+  testDevices={[AdMobBanner.simulatorId]}
+  onAdFailedToLoad={error => console.log(error)}
+/></View>
+
+        
+     
+
+
+
+
+
+
+    <View style={{flexDirection:'row',}}>
         
 
             <TouchableOpacity activeOpacity={0.8} onPress={()=>this.reset()} style={{backgroundColor:'#4b6584',borderRadius:3,width:'50%',height:50,alignItems:'center',justifyContent:'center',borderWidth:2,borderColor:'rgba(0, 22, 0, 0.3)'}}>
@@ -227,3 +252,4 @@ const styles = StyleSheet.create({
 
 //make this component available to the app
 export default Home;
+//ca-app-pub-6147506808396069/4428130567

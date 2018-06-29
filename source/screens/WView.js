@@ -1,26 +1,88 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,WebView} from 'react-native';
+import { View, Text, StyleSheet,WebView,BackHandler,AppState} from 'react-native';
+import { Button } from 'native-base';
+const WEBVIEW_REF = 'webview';
 
 // create a component
 class WView extends Component {
 
     static navigationOptions ={
-        header:null,
+        headerTitle:'My Youtube',
+        headerTintColor: 'white',
+    headerStyle:{
+        backgroundColor:"black",
+
+    },
+    headerTitleStyle:{
+        color:'white'
+    },
+    
     }
+
+    constructor(props){
+        super(props)
+
+        this.state={
+            appstate: AppState.currentState,
+        vidstate:true
+        }
+    }
+
+
+   componentDidMount(){
+    AppState.addEventListener('change', this._handleAppStateChange);
+
+   }
+   componentWillUnmount(){
+    AppState.removeEventListener('change', this._handleAppStateChange);
+
+   }
+    
+   _handleAppStateChange = (nextAppState) => {        
+    this.setState({appState: nextAppState});
+    if (this.state.appState.match(/inactive|background/)) {
+        console.log('App has come to the foreground!')
+        this.setState({vidstate:false})
+      }
+      else if (this.state.appState.match(/active|foreground/)) {
+  
+        this.setState({vidstate:true})
+
+
+    }}
+
+
+
+
     componentWillMount(){
         const { params } = this.props.navigation.state;
+
+        BackHandler.addEventListener('hardwareBackPress', function() {
+            // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
+            // Typically you would use the navigator here to go to the last state.
+          
+            
+            return false;
+          });
         this.setState({videoid:params.id})
-    }
+        }
 
-    compo
-
+      
 
     render() {
         return (
-<WebView
+            <View style={styles.container}>
+        
+        {this.state.vidstate ? 
+        (<WebView
         source={{uri: 'https://www.youtube.com/watch?v='+this.state.videoid}}
-      />            
+      /> )  :null
+        }
+      
+        
+        </View>
+                 
         );
     }
 }
@@ -36,3 +98,4 @@ const styles = StyleSheet.create({
 
 //make this component available to the app
 export default WView;
+//ca-app-pub-3940256099942544/8691691433

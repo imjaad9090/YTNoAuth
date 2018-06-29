@@ -1,5 +1,5 @@
 {
-  "name": "YTApp",
+  "name": "MyYoutube",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -12,12 +12,15 @@
     "react": "16.3.1",
     "react-moment": "^0.7.0",
     "react-native": "0.55.3",
+    "react-native-admob": "^2.0.0-beta.5",
     "react-native-axios": "^0.17.1",
     "react-native-button": "^2.3.0",
     "react-native-fast-image": "^4.0.8",
+    "react-native-snackbar": "^0.4.7",
     "react-native-super-grid": "^2.3.1",
     "react-native-timeago": "^0.4.0",
     "react-native-vector-icons": "^4.6.0",
+    "react-native-webview-android": "^1.1.16",
     "react-navigation": "^1.5.11"
   },
   "devDependencies": {

@@ -1,10 +1,16 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,FlatList,Image,TouchableOpacity,Alert,AsyncStorage,ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet,FlatList,Image,NetInfo,TouchableOpacity,Alert,AsyncStorage,ActivityIndicator,ToastAndroid } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'react-native-axios';
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&regionCode=us&maxResults=40&key=AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY&chart=mostPopular&videoCategoryId='
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+  } from 'react-native-admob'
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&regionCode=us&maxResults=40&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&videoCategoryId='
 // create a component
 class Movies extends Component {
     
@@ -18,7 +24,7 @@ class Movies extends Component {
     },
     headerTitleStyle: { textAlign:"center",alignSelf:"center"},
     headerLeft: (
-      <View style={{left:5}}><Icon name="menu" size={27} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
+      <View style={{flex:1,left:7}}><Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
 
   ),
 });
@@ -33,7 +39,7 @@ class Movies extends Component {
     }
   async componentDidMount(){
     this.setState({isLoading: true})
-
+        
     var names = await AsyncStorage.getItem('names')
 var conames =JSON.parse(names)
 var name1 = conames[2]
@@ -42,6 +48,10 @@ this.props.navigation.setParams({ title: name1 })
         var res = await AsyncStorage.getItem('categories')
         var final = JSON.parse(res)
         console.log(final)
+
+        NetInfo.getConnectionInfo().then((connectionInfo) => {
+            if(connectionInfo.type != 'none'){
+
             axios.get(LINK+final[2])
       .then((response) => {
         console.log(response);
@@ -55,6 +65,15 @@ this.props.navigation.setParams({ title: name1 })
     
         console.log(error);
       });
+    }
+    else {
+        this.setState({isLoading: false})
+    Alert.alert('Ops..','Request failed, please check your internet connection')
+    
+    }
+        });
+
+
     }
 
      showTime(props) {
@@ -92,8 +111,13 @@ this.props.navigation.setParams({ title: name1 })
             console.log(arr1)
             AsyncStorage.setItem('channels',JSON.stringify(arr1))
             console.log('data pushed')
-            Alert.alert('Added','Channel added to the list.')
-
+            ToastAndroid.showWithGravityAndOffset(
+                'Channel added to the list!',
+                ToastAndroid.LONG,
+                ToastAndroid.BOTTOM,
+                25,
+                50
+              );
         
             }
             else if(value == null){
@@ -104,8 +128,13 @@ this.props.navigation.setParams({ title: name1 })
                 let res = await AsyncStorage.getItem('channels');
                 var arr = (JSON.parse(res))
                 console.log('the result updated : '+arr)
-                Alert.alert('Added','Channel added to the list.')
-
+                ToastAndroid.showWithGravityAndOffset(
+                    'Channel added to the list!',
+                    ToastAndroid.LONG,
+                    ToastAndroid.BOTTOM,
+                    25,
+                    50
+                  );
                 // do something else
            }
 
@@ -123,20 +152,23 @@ this.props.navigation.setParams({ title: name1 })
       size="large"
       style={styles.activityIndicator}
     />
-  ) : <FlatList
+  ) : 
+  <View>
+      <View>
+  <FlatList
   showsHorizontalScrollIndicator={false}
   //extraData={this.state.index}
 //horizontal={true}
 keyExtractor={(item, index) => index.toString()}
 data={this.state.store}
 renderItem={({item}) => (
-  <TouchableOpacity activeOpacity={0.9} onLongPress={()=>Alert.alert('Subscribe','Do you want to subscribe to this channel?')} onPress={()=>this.props.navigation.navigate('webview',{id:item.id})} style={{marginVertical:10,}}>
+  <TouchableOpacity activeOpacity={0.9}  onPress={()=>this.props.navigation.navigate('webview',{id:item.id})} style={{marginVertical:10,}}>
 <Text style={{color:'white',fontWeight:"600"}}>{item.snippet.localized.title}</Text>
 <Text style={{color:'white'}}>{item.snippet.channelTitle}</Text>
 {this.showTime(item.contentDetails.duration)}
 <View style={{flexDirection:'row',alignItems:'center'}}>
 <Text style={{color:'white'}}>Add to favourites </Text>
-<Icon name="add-circle" color='#e00' size={26} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
+<Icon name="favorite" color='#e00' size={25} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
 <FastImage
 style={{width:400,height:280,alignSelf:'center'}}
@@ -151,7 +183,18 @@ resizeMode={FastImage.resizeMode.contain}
 />
 
   </TouchableOpacity>
-)}/>}
+)}/>
+</View>
+<View style={{position:'absolute',alignSelf:'center',justifyContent:'flex-end',bottom:0}}>
+  <AdMobBanner
+adSize="smartBannerLandscape"
+  adUnitID="ca-app-pub-9592011956917491/8683582684"
+  testDevices={[AdMobBanner.simulatorId]}
+  onAdFailedToLoad={error => console.log(error)}
+/>
+</View>
+</View>
+}
            
        </View>
         );

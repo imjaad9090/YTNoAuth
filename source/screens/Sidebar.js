@@ -1,22 +1,32 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, StyleSheet,ScrollView,Image,Text,AsyncStorage,BackHandler,Alert} from 'react-native';
+import { View, StyleSheet,ScrollView,Image,Text,ImageBackground,AsyncStorage,BackHandler,Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'
 import { Container, Header, Content, List, Button, ListItem,H3,H2,Left, Body, Right, Switch } from 'native-base';
-
+import {
+  AdMobBanner,
+  AdMobInterstitial,
+  PublisherBanner,
+  AdMobRewarded,
+} from 'react-native-admob'
 // create a component
 class Sidebar extends Component {
 
 
 
-  
-  state={
-    username:'Titan',
-    usermail:'tan@live.com'
+  constructor(){
+    super()
+    this.state={
+      ch:[]
+    }
+    
   }
+  
 
-   async componentWillMount(){
-   
+   async componentDidMount(){
+    var names = await AsyncStorage.getItem('names')
+    var conames =JSON.parse(names)
+    this.setState({ch : conames})
   }
 
 
@@ -44,15 +54,19 @@ class Sidebar extends Component {
         return (
             <View style={styles.container}>
                 <ScrollView>
+
+                 
                 <Content>
-<View style={{backgroundColor:'#000333',width:'100%',height:150,flexDirection:'row',padding:10,alignItems:'center'}}>
+<ImageBackground style={{width:'100%',height:150}} source={require('./bg.jpg')} >
+<View style={{backgroundColor:'transparent',width:'100%',height:150,flexDirection:'row',padding:10,alignItems:'center',opacity:0.2}}>
 
 <View style={{justifyContent:'center',left:10}}>
-<Text style={{color:'white',fontSize:24,fontWeight:"700"}}>Dashboard</Text>
+{/*<Text style={{color:'white',fontSize:24,fontWeight:"700"}}>Dashboard</Text>
 <Text style={{color:'white',fontSize:15}}>Choose preferences</Text>
-
+*/}
 </View>
 </View>
+</ImageBackground>
 
           <List style={{marginRight:6,top:8}}>
             <ListItem onPress={()=>this.props.navigation.pop()} icon>
@@ -74,7 +88,7 @@ class Sidebar extends Component {
                 <Icon name="tv" size={21} color="#ff0000"/>
               </Left>
               <Body>
-                <Text style={{color:'white'}}>Subscriptions</Text>
+                <Text style={{color:'white'}}>My Favourites</Text>
               </Body>
               <Right>
                   <View></View>
@@ -88,7 +102,7 @@ class Sidebar extends Component {
                 <Icon name="radio"  size={21} color="#ff0000" />
               </Left>
               <Body>
-                <Text style={{color:'white'}}>Select Categories</Text>
+                <Text style={{color:'white'}}>Choose Categories</Text>
               </Body>
               <Right>
                   <View></View>
@@ -96,7 +110,7 @@ class Sidebar extends Component {
             </ListItem>
 
 
-        <ListItem  onPress={()=>this.exit()} icon>
+ <ListItem  onPress={()=>this.exit()} icon>
               <Left>
                 <Icon name="x-circle" size={21} color="#ff0000" />
               </Left>
@@ -108,9 +122,64 @@ class Sidebar extends Component {
               </Right>
             </ListItem>
 
+
+          <Text style={{color:'#ff0000',left:10,marginVertical:5,fontSize:20,fontWeight:'500'}}>Selections</Text>
+
+              <ListItem icon>
+              <Left>
+              <Icon name="monitor" size={21} color="#ff0000"/>
+
+              </Left>
+              <Body>
+              <Text style={{color:'white'}}>{this.state.ch[0]}</Text>
+
+              </Body>
+              <Right>
+                  <View></View>
+              </Right>
+            </ListItem>
+
+
+            <ListItem icon>
+              <Left>
+              <Icon name="monitor" size={21} color="#ff0000"/>
+
+              </Left>
+              <Body>
+              <Text style={{color:'white'}}>{this.state.ch[1]}</Text>
+              </Body>
+              <Right>
+                  <View></View>
+              </Right>
+            </ListItem>
+
+
+            <ListItem icon>
+              <Left>
+              <Icon name="monitor" size={21} color="#ff0000"/>
+
+              </Left>
+              <Body>
+              <Text style={{color:'white'}}>{this.state.ch[2]}</Text>
+              </Body>
+              <Right>
+                  <View></View>
+              </Right>
+            </ListItem>
             </List>
+            
             </Content>
+            <View>
+  <AdMobBanner
+adSize="banner"
+  adUnitID="ca-app-pub-9592011956917491/8683582684"
+  testDevices={[AdMobBanner.simulatorId]}
+  onAdFailedToLoad={error => console.log(error)}
+/></View>
                 </ScrollView>
+                <View style={{position:'absolute',bottom:5,left:10}}>
+                <Text style={{textAlign:'left',fontSize:10,color:'#ddc'}}>Version : 2.8.1</Text>
+                </View>
             </View>
         );
     }

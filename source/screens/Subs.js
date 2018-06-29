@@ -1,10 +1,10 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,AsyncStorage,FlatList,TouchableOpacity,Alert } from 'react-native';
+import { View, Text, StyleSheet,AsyncStorage,FlatList,TouchableOpacity,Alert,NetInfo } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-const Link ='https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,status&key=AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY&id='
+const Link ='https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,status&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&id='
 // create a component
 class Subs extends Component {
 
@@ -17,6 +17,7 @@ class Subs extends Component {
 
 
     static navigationOptions={
+
         headerTintColor: 'white',
         headerStyle:{
             backgroundColor:'#030027',
@@ -33,7 +34,8 @@ async componentDidMount(){
     console.log(arr)
     this.setState({channelarray:arr})
     console.log('the result updated : '+arr)
-
+    NetInfo.getConnectionInfo().then((connectionInfo) => {
+        if(connectionInfo.type != 'none'){
     axios.get(Link+arr)
     .then((response) => {
       console.log(response);
@@ -42,7 +44,13 @@ async componentDidMount(){
     .catch((error) => {
       console.log(error);
     });
-      
+}
+else {
+
+    console.log('No connection')
+
+}
+    });
 
 }
 

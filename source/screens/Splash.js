@@ -32,7 +32,7 @@ class Splash extends Component {
      backgroundColor="#000"
      barStyle="light-content"
    />
-            <Image source={require('./yt2.png')} style={{width:120,height:120,resizeMode:'contain'}} />
+            <Image source={require('./yt3.png')} style={{width:120,height:120,resizeMode:'contain'}} />
             <Text style={{fontSize:27,fontWeight:'bold',color:'white'}}>MY YOUTUBE</Text>
           
           

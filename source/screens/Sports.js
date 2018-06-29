@@ -1,11 +1,16 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,FlatList,Image,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button } from 'react-native';
+import { View, Text, StyleSheet,FlatList,Image,ToastAndroid,NetInfo,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=40&key=AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY&chart=mostPopular&regionCode=us&videoCategoryId='
-
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=40&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+  } from 'react-native-admob'
 // create a component
 class Sports extends Component {
 
@@ -20,7 +25,7 @@ class Sports extends Component {
         },
         headerTitleStyle: { textAlign:"center",alignSelf:"center"},
         headerLeft: (
-        <View style={{left:5}}><Icon name="menu" size={27} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
+        <View style={{flex:1,left:7}}><Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
 
     ),
 
@@ -50,18 +55,34 @@ this.props.navigation.setParams({ title: name1 })
     var res = await AsyncStorage.getItem('categories')
     var final = JSON.parse(res)
     console.log(final)
-        axios.get(LINK+final[0])
+       
+    NetInfo.getConnectionInfo().then((connectionInfo) => {
+        if(connectionInfo.type != 'none'){
+    axios.get(LINK+final[0])
   .then((response) => {
+   
     console.log(response);
     this.setState({store:response.data.items})
     this.setState({isLoading: false})
-
+    
   })
   .catch((error) => {
     this.setState({isLoading: false})
     Alert.alert('Ops..','Request failed, please check your internet connection')
     console.log(error);
   });
+
+}
+
+
+else {
+    this.setState({isLoading: false})
+    Alert.alert('Ops..','Request failed, please check your internet connection')
+  
+}
+
+});
+
 
 
   
@@ -103,8 +124,13 @@ this.props.navigation.setParams({ title: name1 })
             console.log(arr1)
             AsyncStorage.setItem('channels',JSON.stringify(arr1))
             console.log('data pushed')
-            Alert.alert('Added','Channel added to the list.')
-
+            ToastAndroid.showWithGravityAndOffset(
+                'Channel added to the list!',
+                ToastAndroid.LONG,
+                ToastAndroid.BOTTOM,
+                25,
+                50
+              );
         
             }
             else if(value == null){
@@ -115,8 +141,13 @@ this.props.navigation.setParams({ title: name1 })
                 let res = await AsyncStorage.getItem('channels');
                 var arr = (JSON.parse(res))
                 console.log('the result updated : '+arr)
-                Alert.alert('Added','Channel added to the list.')
-
+                ToastAndroid.showWithGravityAndOffset(
+                    'Channel added to the list!',
+                    ToastAndroid.SHORT,
+                    ToastAndroid.BOTTOM,
+                    25,
+                    50
+                  );
                 // do something else
            }
 
@@ -143,6 +174,7 @@ this.props.navigation.setParams({ title: name1 })
     />
   ) : 
   <View>
+  <View>
   
   <FlatList
   showsHorizontalScrollIndicator={false}
@@ -158,7 +190,7 @@ renderItem={({item}) => (
 {this.showTime(item.contentDetails.duration)}
 <View style={{flexDirection:'row',alignItems:'center'}}>
 <Text style={{color:'white'}}>Add to favourites </Text>
-<Icon name="add-circle" color='#e00' size={26} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
+<Icon name="favorite" color='#e00' size={25} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
 <TouchableOpacity activeOpacity={0.9} onPress={()=>this.props.navigation.navigate('webview',{id:item.id})}>
 <FastImage
@@ -174,8 +206,18 @@ resizeMode={FastImage.resizeMode.contain}
 
   </View>
 )}/>
+
+</View>
+<View style={{position:'absolute',alignSelf:'center',justifyContent:'flex-end',bottom:0}}>
+  <AdMobBanner
+adSize="smartBannerLandscape"
+  adUnitID="ca-app-pub-9592011956917491/8683582684"
+  testDevices={[AdMobBanner.simulatorId]}
+  onAdFailedToLoad={error => console.log(error)}
+/>
+</View>
 </View>}
-        
+  
        </View>
         );
     }

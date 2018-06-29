@@ -6,11 +6,12 @@ import axios from 'react-native-axios';
 import Moment from 'react-moment';
 import TimeAgo from "react-native-timeago";
 
-const Link= 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY&part=snippet,id&order=date&maxResults=50&type=video&channelId='
+const Link= 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&part=snippet,id&order=date&maxResults=50&type=video&channelId='
 // create a component
 class Videos extends Component {
 
     static navigationOptions={
+        drawerLockMode: 'locked-closed',
         headerTintColor: 'white',
         headerStyle:{
             backgroundColor:'#030027',
@@ -18,7 +19,7 @@ class Videos extends Component {
           headerTitleStyle:{
             color:'white'
           },
-          headerTitle:"Videos"
+          headerTitle:"Channel Feed"
     }
 
     

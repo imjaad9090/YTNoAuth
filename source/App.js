@@ -99,7 +99,7 @@ const Tabs = TabNavigator(
           margin:0,
         color:'white',
         fontWeight:"500",
-        activeTintColor:'#ff0000',
+        //activeTintColor:'#ff0000',
         inactiveTintColor:'#7a7a7a'
         
       },
@@ -129,6 +129,7 @@ const SemiApp = StackNavigator({
 
 //subs : {screen:Subs},
 },{
+  drawerWidth:Number('90%'),
   contentComponent:Sidebar
 })
 
