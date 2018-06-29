@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,StatusBar,TouchableOpacity,Alert,AsyncStorage,Button } from 'react-native';
+import { View, Text, StyleSheet,StatusBar,TouchableOpacity,Alert,AsyncStorage,Button,NetInfo } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import GridView from 'react-native-super-grid';
 
@@ -49,12 +49,17 @@ class Home extends Component {
     }
 
 
+
+
+
     async addList(props){
+        
         function capitalize(string) {
             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
         }
-        if(this.state.list.length < 3)
-{
+        if(this.state.list.length < 3 )
+        
+        {
         let array = this.state.items
 
     var objIndex = array.findIndex((obj => obj.id === props));
@@ -71,27 +76,34 @@ class Home extends Component {
     array[objIndex].added = false
     this.state.ids.pop() 
     this.state.list.pop()
-}
-
-
-
-console.log(this.state.list)
-console.log(this.state.ids)
-
-
-
-
-
+    }
+    console.log(this.state.list)
+    console.log(this.state.ids)
 
     console.log(this.state.items)
     this.setState(prevState => ({index: prevState.index + 1})); 
-}
-else 
-{
-    return Alert.alert('Limit reached','You can select only 3 categories, or try resetting the list. ')
-}
-    
     }
+
+    else if (this.state.list.length == 3 && this.state.ids.includes(props)){
+        
+        console.log(props)
+        let last = this.state.ids[1]
+        console.log(last)
+
+       let array = this.state.items
+    var objIndex = array.findIndex((obj => obj.id === props));
+   
+    array[objIndex].added = false
+    this.state.ids.pop() 
+    this.state.list.pop()
+    this.setState(prevState => ({index: prevState.index + 1}));
+} 
+    else 
+    {
+    return Alert.alert('Limit reached','You can select only 3 categories, or try resetting the list. ')
+    }
+    
+}
 
 
 reset(){
@@ -150,11 +162,16 @@ async submit(){
          navigate('App');
     }
     else {
-        alert('select at least 3 categories')
+        Alert.alert('A moment','Select at least 3 categories')
     }
 }
 
 
+    count(){
+       if(this.state.list.length >0){
+       return <Text style={{color:'#2ed573',alignSelf:'center',fontWeight:"500"}}>{this.state.list.length} out of 3</Text>
+       }
+    }
 
     
     render() {
@@ -164,8 +181,7 @@ async submit(){
        
     <View style={styles.container}>
       <View>
-        {/*<Text style={{color:'#2ed573',alignSelf:'center',fontWeight:"400"}}>{this.state.list}</Text>*/}
-          
+          {this.count()}
     </View>      
 
     <GridView

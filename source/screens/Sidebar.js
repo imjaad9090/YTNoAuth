@@ -8,7 +8,9 @@ import {
   AdMobInterstitial,
   PublisherBanner,
   AdMobRewarded,
-} from 'react-native-admob'
+} from 'react-native-admob';
+import { RNChipView } from 'react-native-chip-view'
+
 // create a component
 class Sidebar extends Component {
 
@@ -123,9 +125,43 @@ class Sidebar extends Component {
             </ListItem>
 
 
-          <Text style={{color:'#ff0000',left:10,marginVertical:5,fontSize:20,fontWeight:'500'}}>Selections</Text>
+         {/*<Text style={{color:'#ff0000',left:10,marginVertical:5,fontSize:20,fontWeight:'500'}}>Selections</Text>*/}
+          <View style={{marginVertical:10}}>
+          <View style={{flexDirection:'row',alignSelf:'center',alignContent:'space-between'}}>
+          <View style={{width:'30%',borderColor:"#b30000",borderWidth:2,borderRadius:40,marginHorizontal:4}}>
+    <RNChipView
+      backgroundColor="#2f3640"
+  title={this.state.ch[0]}
+  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  avatar={false}
+/>
+</View>
 
-              <ListItem icon>
+<View style={{width:'30%',borderColor:"#b30000",borderWidth:2,borderRadius:40}}>
+<RNChipView
+backgroundColor="#2f3640"
+  title={this.state.ch[1]}
+  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  avatar={false}
+/>
+</View>
+
+</View>
+<View style={{marginVertical:2}}>
+<View style={{width:'30%',borderColor:"#b30000",borderWidth:2,borderRadius:40,alignSelf:'center',margin:3}}>
+<RNChipView
+backgroundColor="#2f3640"
+  title={this.state.ch[2]}
+  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  avatar={false}
+/>
+</View>
+</View>
+</View>
+
+
+
+              {/*<ListItem icon>
               <Left>
               <Icon name="monitor" size={21} color="#ff0000"/>
 
@@ -165,18 +201,18 @@ class Sidebar extends Component {
               <Right>
                   <View></View>
               </Right>
-            </ListItem>
+              </ListItem>*/}
             </List>
-            
             </Content>
-            <View>
+            
+                </ScrollView>
+                <View style={{bottom:0}}>
   <AdMobBanner
 adSize="banner"
   adUnitID="ca-app-pub-9592011956917491/8683582684"
   testDevices={[AdMobBanner.simulatorId]}
   onAdFailedToLoad={error => console.log(error)}
 /></View>
-                </ScrollView>
                 <View style={{position:'absolute',bottom:5,left:10}}>
                 <Text style={{textAlign:'left',fontSize:10,color:'#ddc'}}>Version : 2.8.1</Text>
                 </View>

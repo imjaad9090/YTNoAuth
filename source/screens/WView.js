@@ -1,8 +1,8 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,WebView,BackHandler,AppState} from 'react-native';
+import { View, Text, StyleSheet,BackHandler,AppState} from 'react-native';
 import { Button } from 'native-base';
-const WEBVIEW_REF = 'webview';
+import WebView from 'react-native-android-fullscreen-webview-video';
 
 // create a component
 class WView extends Component {

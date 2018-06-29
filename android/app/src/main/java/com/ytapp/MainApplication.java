@@ -3,7 +3,9 @@ package com.richtech.myoutube;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+//import com.azendoo.reactnativesnackbar.SnackbarPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.airship.customwebview.CustomWebViewPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -30,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
          new VectorIconsPackage(),
           new RNAdMobPackage(),
+          new CustomWebViewPackage(),
         new FastImageViewPackage()
       );
     }
