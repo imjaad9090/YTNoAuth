@@ -77,10 +77,12 @@ class WView extends Component {
         {this.state.vidstate ? 
         (<WebView
         source={{uri: 'https://www.youtube.com/watch?v='+this.state.videoid}}
-      /> )  :null
+      />
+      
+     )  :null
         }
       
-        
+      
         </View>
                  
         );

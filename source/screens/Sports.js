@@ -1,7 +1,8 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,FlatList,Image,ToastAndroid,NetInfo,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button } from 'react-native';
+import { View, Text, StyleSheet,FlatList,Image,TextInput,ToastAndroid,NetInfo,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button } from 'react-native';
 import FastImage from 'react-native-fast-image'
+import { DrawerActions } from 'react-navigation';
 import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=40&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
@@ -11,31 +12,47 @@ import {
     PublisherBanner,
     AdMobRewarded,
   } from 'react-native-admob'
+  import { Toolbar } from 'react-native-material-ui';
+
 // create a component
 class Sports extends Component {
+
+    static navigationOptions ={
+        header:null
+    }
 
 
     static navigationOptions =({navigation})=> ({
 
         title:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
         tabBarLabel:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
+        
+        headerMode:'float',
         headerStyle:{
             //elevation:0,
+            padding:10
+
 
         },
-        headerTitleStyle: { textAlign:"center",alignSelf:"center"},
+        headerTitleStyle: {textAlign:"center",alignSelf:"center"},
         headerLeft: (
-        <View style={{flex:1,left:7}}><Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
+        <View style={{paddingLeft:7}}>
+        <Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/>
+        </View>
 
     ),
+        /*headerRight:(
+            
 
-       
+            <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5}} size={26} color="#fff" onPress={()=>alert('hello')} /></View>
+        )*/  
 });
 
 
     constructor(){
         super()
         this.state={
+            searchToggle:false,
             store:[],
             selected:[],
             notified:false,
@@ -160,10 +177,27 @@ else {
         return (
 
             <View style={styles.container}>
-<StatusBar
+    <StatusBar
      backgroundColor="#0b091e"
      barStyle="light-content"
    />
+   {/*<Toolbar
+        leftElement="menu"
+        centerElement={this.state.datitle}
+        searchable={{
+          autoFocus: true,
+          placeholder: 'MEnu',
+        }}
+        rightElement={{
+            menu: {
+                icon: "more-vert",
+                labels: ["item 1", "item 2"]
+            }
+        }}
+        style={{container:{backgroundColor:'#080027',top:0,left:0,right:0}}}
+        onRightElementPress={ (label) => { console.log(label) }}
+        onLeftElementPress={({navigation}) => this.props.navigation.dispatch(DrawerActions.openDrawer())}
+    />*/}
 
    {this.state.isLoading ? (
     <ActivityIndicator
@@ -174,8 +208,52 @@ else {
     />
   ) : 
   <View>
+
+
+      
   <View>
-  
+            
+            {this.state.searchToggle && 
+            <View style={{width:'100%',padding:8,paddingHorizontal:10,
+           
+                height:'9%',borderColor:'transparent',backgroundColor:'#7b050b',}}>
+            
+            <View style={{flex:1,flexDirection:'row',backgroundColor:'#dd0914',
+                borderRadius:4}}>
+            <View style={{justifyContent:'center',paddingLeft:2}}>
+            <Icon name='search' color='white' size={22} />
+
+            </View>
+            <TextInput  
+             //onTouchStart={()=> this.setState({show:false,body:true})}
+           selectionColor={'black'}
+            underlineColorAndroid='transparent'
+            autoCorrect={false}
+            //autoCapitalize='none'
+            placeholderTextColor="#bfbfbf"
+            //onChangeText={(text)=>this.search(text)}
+            placeholder='Search videos..'
+            style={{
+                //position:'absolute',
+                textDecorationLine:'none',
+                textDecorationColor:'transparent',
+                color:'white',
+                fontWeight:'400',
+                width:'100%',
+                position:'relative',
+                fontStyle:'normal',
+                fontSize:17,
+                   
+            }} />
+            </View>
+           
+            </View> 
+            }
+
+
+
+
+
   <FlatList
   showsHorizontalScrollIndicator={false}
   //extraData={this.state.index}
@@ -207,7 +285,7 @@ resizeMode={FastImage.resizeMode.contain}
   </View>
 )}/>
 
-</View>
+    </View> 
 <View style={{position:'absolute',alignSelf:'center',justifyContent:'flex-end',bottom:0}}>
   <AdMobBanner
 adSize="smartBannerLandscape"

@@ -126,13 +126,13 @@ class Sidebar extends Component {
 
 
          {/*<Text style={{color:'#ff0000',left:10,marginVertical:5,fontSize:20,fontWeight:'500'}}>Selections</Text>*/}
-          <View style={{marginVertical:10}}>
+          <View style={{marginVertical:15}}>
           <View style={{flexDirection:'row',alignSelf:'center',alignContent:'space-between'}}>
           <View style={{width:'30%',borderColor:"#b30000",borderWidth:2,borderRadius:40,marginHorizontal:4}}>
     <RNChipView
       backgroundColor="#2f3640"
   title={this.state.ch[0]}
-  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  titleStyle={{flex:1,textAlign:'center',textWrap:'wrap',color:'#ff0000',fontWeight:'400',fontSize:13}}
   avatar={false}
 />
 </View>
@@ -141,7 +141,7 @@ class Sidebar extends Component {
 <RNChipView
 backgroundColor="#2f3640"
   title={this.state.ch[1]}
-  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  titleStyle={{flex:1,textAlign:'center',textWrap:'wrap',color:'#ff0000',fontWeight:'400',fontSize:13}}
   avatar={false}
 />
 </View>
@@ -152,7 +152,7 @@ backgroundColor="#2f3640"
 <RNChipView
 backgroundColor="#2f3640"
   title={this.state.ch[2]}
-  titleStyle={{color:'#ff0000',fontWeight:'400',fontSize:13}}
+  titleStyle={{flex:1,textAlign:'center',textWrap:'wrap',color:'#ff0000',fontWeight:'400',fontSize:13}}
   avatar={false}
 />
 </View>
