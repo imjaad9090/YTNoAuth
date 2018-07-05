@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet,BackHandler,AppState} from 'react-native';
 import { Button } from 'native-base';
 import WebView from 'react-native-android-fullscreen-webview-video';
+const WEBVIEW_REF = 'webview';
 
 // create a component
 class WView extends Component {
@@ -22,6 +23,7 @@ class WView extends Component {
 
     constructor(props){
         super(props)
+        this._handleAppStateChange = this._handleAppStateChange.bind(this)
 
         this.state={
             appstate: AppState.currentState,
@@ -65,17 +67,21 @@ class WView extends Component {
             
             return false;
           });
+          console.log(params.id)
         this.setState({videoid:params.id})
         }
 
       
+      
 
     render() {
+        
         return (
             <View style={styles.container}>
         
         {this.state.vidstate ? 
         (<WebView
+            ref={WEBVIEW_REF}
         source={{uri: 'https://www.youtube.com/watch?v='+this.state.videoid}}
       />
       

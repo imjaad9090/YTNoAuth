@@ -1,11 +1,18 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,FlatList,Image,TextInput,ToastAndroid,NetInfo,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button } from 'react-native';
+import { View, Text, StyleSheet,FlatList,Image,AppState,TextInput,ToastAndroid,NetInfo,TouchableOpacity,StatusBar,Alert,AsyncStorage,ActivityIndicator,Button,ScrollView,Platform,Keyboard,TouchableWithoutFeedback } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { DrawerActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation';
+searchURL = "http://suggestqueries.google.com/complete/search?client=chrome&q=";
+var parseString = require('react-native-xml2js').parseString
+import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
+const Q = 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyDNE4eFVL3Pi2nx5XT1HQDA9KJk9E5ky_0&part=player,contentDetails,snippet&order=date&type=video&maxResults=50&regionCode=us&q=?'
 import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=40&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
+const SEARCH = 'http://clients1.google.com/complete/search?hl=en&output=toolbar&gl=us&ds=yt&q=?'
+var Spinner = require('react-native-spinkit');
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
 import {
     AdMobBanner,
     AdMobInterstitial,
@@ -13,18 +20,18 @@ import {
     AdMobRewarded,
   } from 'react-native-admob'
   import { Toolbar } from 'react-native-material-ui';
+  import * as Animatable from 'react-native-animatable';
 
 // create a component
 class Sports extends Component {
 
-    static navigationOptions ={
-        header:null
-    }
+    
 
 
-    static navigationOptions =({navigation})=> ({
+    static navigationOptions =({navigation,screenProps})=> ({
 
-        title:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
+
+ title:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
         tabBarLabel:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
         
         headerMode:'float',
@@ -40,46 +47,112 @@ class Sports extends Component {
         <Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/>
         </View>
 
-    ),
-        /*headerRight:(
-            
+            ),
+        headerRight: navigation.state.params ? navigation.state.params.headerRight : null
 
-            <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5}} size={26} color="#fff" onPress={()=>alert('hello')} /></View>
-        )*/  
+            /*headerRight:(
+        <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5}} size={26} color="#fff" onPress={()=>alert('Locations')} /></View>
+
+            )*/
 });
 
 
-    constructor(){
-        super()
+    constructor(props){
+        super(props);
+        //this.focusTextInput = this.focusTextInput.bind(this);
+
         this.state={
+            showad:true,
+            loading:false,
+            //sendfunc:undefined,
             searchToggle:false,
+            searchRes:[],
             store:[],
             selected:[],
             notified:false,
             index:0,  
-            isLoading: false
+            isLoading: false,
+            nextPageToken:''
 
         }
     }
+
+   
+    
+    toggle(){
+
+        if(this.state.searchToggle==false)
+        {
+            //this.props.navigation.setParams({ title: "Search" })
+            this.setState({searchToggle:true,searchRes:[]})
+        }
+        else{
+            //this.props.navigation.setParams({ title: this.state.headtitle })
+
+            this.setState({searchToggle:false,searchRes:[]})
+
+        }
+
+    }
+
+    clearAds(){
+        this.setState({showad:false})
+        console.log('clear ads')
+        //clearInterval(this.sendfunc);
+
+    }
+    
+    
+
    async componentDidMount(){
+    this.sendfunc = setInterval(()=> this.showAdView(), 40000)
+
+    this.props.navigation.addListener('willBlur', (route) => { 
+        //console.log('tab blurred')
+        this.clearAds()
+
+
+    })
+    this.props.navigation.addListener('willFocus', (route) => { 
+       this.setState({showad:true})
+        console.log('tab focued')
+    })
+
+
+    this.props.navigation.setParams({
+        headerRight: (
+            <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5,padding:15,}} size={26} color="#fff" onPress={()=>this.toggle()} /></View>
+        )
+      })
+
     this.setState({isLoading: true})
 
 var names = await AsyncStorage.getItem('names')
 var conames =JSON.parse(names)
 this.setState({datitle:conames[0]})
 var name1 = conames[0]
+this.setState({headtitle:name1})
 this.props.navigation.setParams({ title: name1 })
     var res = await AsyncStorage.getItem('categories')
     var final = JSON.parse(res)
-    console.log(final)
-       
+    
+    console.log(final)    
+    this.setState({catID:final[0]})
     NetInfo.getConnectionInfo().then((connectionInfo) => {
         if(connectionInfo.type != 'none'){
     axios.get(LINK+final[0])
-  .then((response) => {
+    .then((response) => {
    
     console.log(response);
     this.setState({store:response.data.items})
+        if(response.data.nextPageToken){
+            this.setState({nextPageToken:response.data.nextPageToken})
+        }
+        else{
+            this.setState({nextPageToken:'null'})
+        }
+
+
     this.setState({isLoading: false})
     
   })
@@ -97,14 +170,15 @@ else {
     Alert.alert('Ops..','Request failed, please check your internet connection')
   
 }
-
 });
 
 
-
-  
-
+if (Platform.OS === 'android'){
+    AndroidKeyboardAdjust.setAdjustPan();
+}
     }
+
+
 
 
     showTime(props) {
@@ -124,6 +198,26 @@ else {
         var ddew = ans.toFixed(0);
         return <Text style={{color:'red'}}>{ddew} minutes</Text>
       }
+
+
+       showAdView(){
+        let { routeName } = this.props.navigation.state;
+        console.log(routeName)
+        
+      if(this.state.showad == true) {
+        AdMobInterstitial.setAdUnitID('ca-app-pub-9592011956917491/6699231376');
+        AdMobInterstitial.setTestDevices([AdMobInterstitial.simulatorId]);
+        AdMobInterstitial.requestAd().then(() => AdMobInterstitial.showAd())
+        console.log('ad displayed?')
+    
+    }
+    else if(this.state.showad == false) {
+        console.log('Dont show ads')
+    }
+
+
+      }
+
 
 
         async addChannel(props){
@@ -171,6 +265,80 @@ else {
       }
 
 
+      search(props){
+        if(props.length > 3){
+            axios.get(SEARCH+props)
+            .then((response) => {
+                var str = (response.data)
+                var temp = []
+                //console.log(result)
+                parseString(str, (err, result) => {
+                    
+                    for(let i = 0;i<result.toplevel.CompleteSuggestion.length;i++){
+                        temp.push({title:result.toplevel.CompleteSuggestion[i].suggestion[0].$.data})
+                    }
+                    console.log(temp);
+                    this.setState({searchRes:temp})
+                    
+                });
+                console.log(this.state.searchRes)
+            })
+
+      .catch((error) => {
+        
+        console.log(error);
+      });
+        }
+       
+      }
+      sendnext(props){
+        this.setState({searchRes:[]})
+        this.props.navigation.navigate('search',{query:JSON.stringify(props)})
+      }
+
+
+      componentWillUnmount(){
+
+        clearInterval(this.sendfunc);
+        console.log('left')
+
+      }
+
+      onEndReached() {
+        
+
+            console.log('end reached'+this.state.nextPageToken)
+
+            if(this.state.nextPageToken != 'null'){
+            
+            axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
+          .then((response) => {
+           
+            console.log(response);
+            let old = this.state.store
+    
+            var result = old.concat(response.data.items)
+            //response.data.items
+            this.setState({store:result,nextPageToken:response.data.nextPageToken})
+
+          })
+          .catch((error) => {
+             console.log(error);
+
+          });            
+        
+        }
+        else{
+            console.log('No next page token found')
+        }
+
+        }
+       
+      
+        openWebview(props){
+            this.props.navigation.navigate('webview',{id:props})
+            clearInterval(this.sendfunc)
+        }
 
     render() {
 
@@ -181,6 +349,10 @@ else {
      backgroundColor="#0b091e"
      barStyle="light-content"
    />
+
+           
+
+
    {/*<Toolbar
         leftElement="menu"
         centerElement={this.state.datitle}
@@ -198,6 +370,68 @@ else {
         onRightElementPress={ (label) => { console.log(label) }}
         onLeftElementPress={({navigation}) => this.props.navigation.dispatch(DrawerActions.openDrawer())}
     />*/}
+    
+    
+    
+    
+    {this.state.searchToggle ?  
+    (<Animatable.View   animation="fadeIn" duration={200} easing="ease-in" style={{width:'100%',padding:5,paddingHorizontal:10,position:"relative",
+           
+           height:'10%',borderColor:'transparent',backgroundColor:'#7b050b',}}>
+       
+       <View style={{flex:1,flexDirection:'row',backgroundColor:'#dd0914',
+           borderRadius:4,alignItems:'center'}}>
+       <View style={{justifyContent:'center',paddingLeft:2}}>
+       <Icon name='search' color='white' size={22} />
+
+       </View>
+       <TextInput  
+          //ref={(input) => { this.textInput = input }} 
+        autoFocus={true}
+        placeholder="Search"
+        onTouchStart={()=> this.setState({searchRes:[]})}
+      selectionColor={'white'}
+       underlineColorAndroid='transparent'
+       autoCorrect={false}
+       //autoCapitalize='none'
+       placeholderTextColor="#bfbfbf"
+       onChangeText={(text)=>this.search(text)}
+       placeholder=''
+       style={{height:'100%',
+       justifyContent:'center',
+           textDecorationLine:'none',
+           textDecorationColor:'transparent',
+           color:'white',
+           fontWeight:'400',
+           alignItems:'center',
+           width:'100%',
+           position:'relative',
+           fontStyle:'normal',
+           fontSize:16,
+              
+       }} />
+       </View>
+      
+       </Animatable.View>) : null
+    }
+
+
+    <View style={{padding:2}}>
+    <FlatList        
+    style={{borderRadius:2,backgroundColor:'transparent',marginHorizontal:5}}
+    showsHorizontalScrollIndicator={false}
+    //extraData={this.state.index}
+    //horizontal={true}
+    keyExtractor={(item, index) => index.toString()}
+    data={this.state.searchRes}
+    renderItem={({item}) => (
+        <View style={{backgroundColor:"white"}}>
+    <TouchableOpacity onPress={()=>this.sendnext(item.title)} style={{backgroundColor:'white',height:30,paddingHorizontal:6,justifyContent:"center"}}>
+    <Text style={{color:'black',fontWeight:'300',fontSize:15}}>{item.title}</Text>
+    </TouchableOpacity>
+    </View>
+    )}/>
+    </View>
 
    {this.state.isLoading ? (
     <ActivityIndicator
@@ -207,60 +441,22 @@ else {
       style={styles.activityIndicator}
     />
   ) : 
+  <View> 
+  
   <View>
-
-
-      
-  <View>
-            
-            {this.state.searchToggle && 
-            <View style={{width:'100%',padding:8,paddingHorizontal:10,
-           
-                height:'9%',borderColor:'transparent',backgroundColor:'#7b050b',}}>
-            
-            <View style={{flex:1,flexDirection:'row',backgroundColor:'#dd0914',
-                borderRadius:4}}>
-            <View style={{justifyContent:'center',paddingLeft:2}}>
-            <Icon name='search' color='white' size={22} />
-
-            </View>
-            <TextInput  
-             //onTouchStart={()=> this.setState({show:false,body:true})}
-           selectionColor={'black'}
-            underlineColorAndroid='transparent'
-            autoCorrect={false}
-            //autoCapitalize='none'
-            placeholderTextColor="#bfbfbf"
-            //onChangeText={(text)=>this.search(text)}
-            placeholder='Search videos..'
-            style={{
-                //position:'absolute',
-                textDecorationLine:'none',
-                textDecorationColor:'transparent',
-                color:'white',
-                fontWeight:'400',
-                width:'100%',
-                position:'relative',
-                fontStyle:'normal',
-                fontSize:17,
-                   
-            }} />
-            </View>
-           
-            </View> 
-            }
-
-
-
-
 
   <FlatList
   showsHorizontalScrollIndicator={false}
   //extraData={this.state.index}
 //horizontal={true}
+
 keyExtractor={(item, index) => index.toString()}
 data={this.state.store}
-extraData={this.state.index}
+onEndReached={this.onEndReached.bind(this)}
+//onEndReachedThreshold={0.4}
+//onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
+//ListFooterComponent={() =>}
+//extraData={this.state.index}
 renderItem={({item}) => (
   <View style={{marginVertical:10}}>
 <Text style={{color:'white',fontWeight:"600"}}>{item.snippet.localized.title}</Text>
@@ -270,7 +466,7 @@ renderItem={({item}) => (
 <Text style={{color:'white'}}>Add to favourites </Text>
 <Icon name="favorite" color='#e00' size={25} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
-<TouchableOpacity activeOpacity={0.9} onPress={()=>this.props.navigation.navigate('webview',{id:item.id})}>
+<TouchableOpacity activeOpacity={0.9} onPress={()=>this.openWebview(item.id)}>
 <FastImage
 style={{width:400,height:280,alignSelf:'center'}}
 source={{
@@ -284,8 +480,18 @@ resizeMode={FastImage.resizeMode.contain}
 
   </View>
 )}/>
-
     </View> 
+{this.state.loading ? 
+(<View style={{alignItems:'center',justifyContent:'center',position:'absolute',alignSelf:'center',backgroundColor:'#2f3640',width:'18%',height:'10%',borderRadius:5,borderWidth:1,borderColor:'#bdc3c7'}}>
+<ActivityIndicator
+      animating
+      color="#e00"
+      size="large"
+      //style={styles.activityIndicator}
+    />
+    </View>) : null
+}
+
 <View style={{position:'absolute',alignSelf:'center',justifyContent:'flex-end',bottom:0}}>
   <AdMobBanner
 adSize="smartBannerLandscape"

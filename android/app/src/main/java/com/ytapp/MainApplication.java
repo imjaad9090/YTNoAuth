@@ -1,17 +1,19 @@
 package com.richtech.myoutube;
 
 import android.app.Application;
-
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.facebook.react.ReactApplication;
 //import com.azendoo.reactnativesnackbar.SnackbarPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.airship.customwebview.CustomWebViewPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.react.ReactNativeHost;
+import com.react.rnspinkit.RNSpinkitPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.sbugert.rnadmob.RNAdMobPackage;
+import net.zubricky.AndroidKeyboardAdjust.AndroidKeyboardAdjustPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +35,11 @@ public class MainApplication extends Application implements ReactApplication {
          new VectorIconsPackage(),
           new RNAdMobPackage(),
           new CustomWebViewPackage(),
-        new FastImageViewPackage()
+        new FastImageViewPackage(),
+        new AndroidKeyboardAdjustPackage(),
+        new SplashScreenReactPackage(),  
+        new RNSpinkitPackage()
+
       );
     }
 

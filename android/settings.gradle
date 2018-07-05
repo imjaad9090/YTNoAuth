@@ -1,6 +1,12 @@
 rootProject.name = 'YTApp'
+include ':react-native-spinkit'
+project(':react-native-spinkit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-spinkit/android')
+include ':react-native-splash-screen'
+project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
 include ':react-native-android-fullscreen-webview-video'
 project(':react-native-android-fullscreen-webview-video').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-fullscreen-webview-video/android')
+include ':react-native-android-keyboard-adjust'
+project(':react-native-android-keyboard-adjust').projectDir = new File(settingsDir, '../node_modules/react-native-android-keyboard-adjust/android')
 
 include ':react-native-admob'
 project(':react-native-admob').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-admob/android')

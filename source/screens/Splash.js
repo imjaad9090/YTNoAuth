@@ -2,12 +2,16 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,Image,AsyncStorage,StatusBar } from 'react-native';
 
+
 // create a component
 class Splash extends Component {
     constructor(props) {
         super(props);
         this._bootstrapAsync();
       }
+
+
+     
 
 
       // Fetch the token from storage then navigate to our appropriate place

@@ -1,8 +1,13 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,FlatList,Image,NetInfo,TouchableOpacity,Alert,AsyncStorage,ActivityIndicator,ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet,FlatList,Image,TextInput,Platform,NetInfo,TouchableOpacity,Alert,AsyncStorage,ActivityIndicator,ToastAndroid } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+var parseString = require('react-native-xml2js').parseString
+import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
+import * as Animatable from 'react-native-animatable';
+const SEARCH = 'http://clients1.google.com/complete/search?hl=en&output=toolbar&gl=us&ds=yt&q=?'
+
 import axios from 'react-native-axios';
 import {
     AdMobBanner,
@@ -10,11 +15,13 @@ import {
     PublisherBanner,
     AdMobRewarded,
   } from 'react-native-admob'
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&regionCode=us&maxResults=40&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&videoCategoryId='
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&regionCode=us&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&videoCategoryId='
 // create a component
 class Movies extends Component {
-    
-  static navigationOptions =({navigation})=> ({
+ 
+ 
+  
+  static navigationOptions =({navigation,screenProps})=> ({
 
     title:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
     tabBarLabel:typeof(navigation.state.params)==='undefined' || typeof(navigation.state.params.title) === 'undefined' ? 'Loading': navigation.state.params.title,
@@ -27,17 +34,50 @@ class Movies extends Component {
       <View style={{flex:1,left:7}}><Icon name="menu" size={28} color="#fff" onPress={()=>navigation.navigate('DrawerOpen')}/></View>
 
   ),
+  headerRight: navigation.state.params ? navigation.state.params.headerRight : null
+
 });
     constructor(){
         super()
         this.state={
+          searchToggle:false,
+            searchRes:[],
             store:[],
             selected:[],
-            isLoading: false
+            isLoading: false,
+            nextPageToken:''
 
         }
     }
+
+
+
+    toggle(){
+
+      if(this.state.searchToggle==false)
+      {
+          //this.props.navigation.setParams({ title: "Search" })
+          this.setState({searchToggle:true,searchRes:[]})
+      }
+      else{
+          //this.props.navigation.setParams({ title: this.state.headtitle })
+
+          this.setState({searchToggle:false,searchRes:[]})
+
+      }
+
+  }
   async componentDidMount(){
+
+
+
+    this.props.navigation.setParams({
+      headerRight: (
+          <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5,padding:15}} size={26} color="#fff" onPress={()=>this.toggle()} /></View>
+      )
+    })
+
+
     this.setState({isLoading: true})
         
     var names = await AsyncStorage.getItem('names')
@@ -48,6 +88,7 @@ this.props.navigation.setParams({ title: name1 })
         var res = await AsyncStorage.getItem('categories')
         var final = JSON.parse(res)
         console.log(final)
+        this.setState({catID:final[2]})
 
         NetInfo.getConnectionInfo().then((connectionInfo) => {
             if(connectionInfo.type != 'none'){
@@ -56,6 +97,12 @@ this.props.navigation.setParams({ title: name1 })
       .then((response) => {
         console.log(response);
         this.setState({store:response.data.items})
+        if(response.data.nextPageToken){
+            this.setState({nextPageToken:response.data.nextPageToken})
+        }
+        else{
+            this.setState({nextPageToken:'null'})
+        }
         this.setState({isLoading: false})
 
       })
@@ -72,6 +119,9 @@ this.props.navigation.setParams({ title: name1 })
     
     }
         });
+        if (Platform.OS === 'android'){
+          AndroidKeyboardAdjust.setAdjustPan();
+      }
 
 
     }
@@ -139,11 +189,133 @@ this.props.navigation.setParams({ title: name1 })
            }
 
       }
+      search(props){
+        if(props.length > 3){
+            axios.get(SEARCH+props)
+            .then((response) => {
+                var str = (response.data)
+                var temp = []
+                //console.log(result)
+                parseString(str, (err, result) => {
+                    
+                    for(let i = 0;i<result.toplevel.CompleteSuggestion.length;i++){
+                        temp.push({title:result.toplevel.CompleteSuggestion[i].suggestion[0].$.data})
+                    }
+                    console.log(temp);
+                    this.setState({searchRes:temp})
+                    
+                });
+                console.log(this.state.searchRes)
+            })
+
+      .catch((error) => {
+        
+        console.log(error);
+      });
+        }
+       
+      }
 
 
+      sendnext(props){
+        this.setState({searchRes:[]})
+        this.props.navigation.navigate('search',{query:JSON.stringify(props)})
+      }
+
+
+
+      onEndReached() {
+        
+
+        console.log('end reached'+this.state.nextPageToken)
+
+        if(this.state.nextPageToken != 'null'){
+        
+        axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
+      .then((response) => {
+       
+        console.log(response);
+        let old = this.state.store
+
+        var result = old.concat(response.data.items)
+        //response.data.items
+        this.setState({store:result,nextPageToken:response.data.nextPageToken})
+
+      })
+      .catch((error) => {
+         console.log(error);
+
+      });            
+    
+    }
+    else{
+        console.log('No next page token found')
+    }
+
+    }
     render() {
         return (
             <View style={styles.container}>
+
+          {   this.state.searchToggle ?  
+                (<Animatable.View   animation="fadeIn" duration={200} easing="ease-in" style={{width:'100%',padding:5,paddingHorizontal:10,position:"relative",
+                       
+                       height:'10%',borderColor:'transparent',backgroundColor:'#7b050b',}}>
+                   
+                   <View style={{flex:1,flexDirection:'row',backgroundColor:'#dd0914',
+                       borderRadius:4,alignItems:'center'}}>
+                   <View style={{justifyContent:'center',paddingLeft:2}}>
+                   <Icon name='search' color='white' size={22} />
+            
+                   </View>
+                   <TextInput  
+                onTouchStart={()=> this.setState({searchRes:[]})}
+                autoFocus={true}
+                  selectionColor={'black'}
+                   underlineColorAndroid='transparent'
+                   autoCorrect={false}
+                   //autoCapitalize='none'
+                   placeholderTextColor="#bfbfbf"
+                   onChangeText={(text)=>this.search(text)}
+                   placeholder=''
+                   style={{height:'100%',
+                   justifyContent:'center',
+                       textDecorationLine:'none',
+                       textDecorationColor:'transparent',
+                       color:'white',
+                       fontWeight:'400',
+                       alignItems:'center',
+                       width:'100%',
+                       position:'relative',
+                       fontStyle:'normal',
+                       fontSize:15,
+                          
+                   }} />
+                   </View>
+                  
+                   </Animatable.View>) : null
+                }
+            
+            
+                <View style={{padding:2}}>
+                <FlatList        
+                style={{borderRadius:2,backgroundColor:'transparent',marginHorizontal:5}}
+                showsHorizontalScrollIndicator={false}
+                //extraData={this.state.index}
+                //horizontal={true}
+                keyExtractor={(item, index) => index.toString()}
+                data={this.state.searchRes}
+                renderItem={({item}) => (
+                    <View style={{backgroundColor:"white"}}>
+                <TouchableOpacity onPress={()=>this.sendnext(item.title)} style={{backgroundColor:'white',height:30,paddingHorizontal:6,justifyContent:"center"}}>
+                <Text style={{color:'black',fontWeight:'300',fontSize:15}}>{item.title}</Text>
+                </TouchableOpacity>
+                </View>
+                )}/>
+                </View>
+
+
+
 
             {this.state.isLoading ? (
     <ActivityIndicator
@@ -161,6 +333,7 @@ this.props.navigation.setParams({ title: name1 })
 //horizontal={true}
 keyExtractor={(item, index) => index.toString()}
 data={this.state.store}
+onEndReached={this.onEndReached.bind(this)}
 renderItem={({item}) => (
   <TouchableOpacity activeOpacity={0.9}  onPress={()=>this.props.navigation.navigate('webview',{id:item.id})} style={{marginVertical:10,}}>
 <Text style={{color:'white',fontWeight:"600"}}>{item.snippet.localized.title}</Text>

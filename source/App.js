@@ -24,16 +24,23 @@ import Videos from './screens/Videos';
 import Home from './screens/Home';
 import Cats from './screens/Cats';
 import Splash from './screens/Splash';
+import TabView from './screens/TabView';
+import Search from './screens/Search';
 
 //AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY
 
 const Stack = StackNavigator({
+  Tabview : {screen : TabView},
   Gaming: {screen : Gaming},
   Sports: {screen : Sports},
   Movies : {screen : Movies},
   webview  : {screen : WView},
+  search : {screen  :Search}
   //subs : {screen:Subs},
+},
 
+{
+  initialRouteName:'Tabview'
 })
 
 
@@ -111,10 +118,12 @@ const Tabs = TabNavigator(
     }
 })
 
+
 const SemiApp = StackNavigator({
   home : {screen:Home},
   tabs : {screen:Tabs},
   webview :{screen:WView},
+  search: {screen : Search},
   Sports :{screen:Sports},
   subs : {screen:Subs},
   vids : {screen:Videos},
@@ -129,13 +138,15 @@ const SemiApp = StackNavigator({
 
 //subs : {screen:Subs},
 },{
-  drawerWidth:Number('90%'),
   contentComponent:Sidebar
 })
 
 const Homestack = StackNavigator({
   final:{screen:Home}
 })
+
+
+
 
 export default App = SwitchNavigator(
   {
