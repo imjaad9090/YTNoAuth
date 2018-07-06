@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,FlatList,Image,TextInput,Platform,NetInfo,TouchableOpacity,Alert,AsyncStorage,ActivityIndicator,ToastAndroid } from 'react-native';
 import FastImage from 'react-native-fast-image';
+var numeral = require('numeral');
 import Icon from 'react-native-vector-icons/MaterialIcons';
 var parseString = require('react-native-xml2js').parseString
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
@@ -15,7 +16,7 @@ import {
     PublisherBanner,
     AdMobRewarded,
   } from 'react-native-admob'
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&regionCode=us&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&videoCategoryId='
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&regionCode=us&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&videoCategoryId='
 // create a component
 class Movies extends Component {
  
@@ -141,9 +142,14 @@ this.props.navigation.setParams({ title: name1 })
       
         var ans= (hours * 3600 + minutes * 60 + seconds)/60;
         var ddew = ans.toFixed(0);
-        return <Text style={{color:'red'}}>{ddew} minutes</Text>
-      }
+        return <Text style={{color:'#b2bec3',marginHorizontal:3}}>{ddew} minutes </Text>
+    }
 
+    showViews(props){
+      var string = numeral(props).format('0,0');
+      return <Text style={{color:'#b2bec3',marginHorizontal:3}}> {string} views </Text>
+
+    }
 
 
       async addChannel(props){
@@ -231,7 +237,7 @@ this.props.navigation.setParams({ title: name1 })
 
         if(this.state.nextPageToken != 'null'){
         
-        axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
+        axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
       .then((response) => {
        
         console.log(response);
@@ -336,12 +342,20 @@ data={this.state.store}
 onEndReached={this.onEndReached.bind(this)}
 renderItem={({item}) => (
   <TouchableOpacity activeOpacity={0.9}  onPress={()=>this.props.navigation.navigate('webview',{id:item.id})} style={{marginVertical:10,}}>
-<Text style={{color:'white',fontWeight:"600"}}>{item.snippet.localized.title}</Text>
+<Text style={{color:'white',fontWeight:"400",fontSize:16}}>{item.snippet.localized.title}</Text>
 <Text style={{color:'white'}}>{item.snippet.channelTitle}</Text>
+
+<View style={{flexDirection:'row',alignItems:'center'}}>
+<Icon name="play-circle-outline" style={{marginLeft:3}} color="#e00" size={16} /> 
 {this.showTime(item.contentDetails.duration)}
+<Icon name="remove-red-eye" style={{marginLeft:3}} color="#e00" size={16} /> 
+
+{this.showViews(item.statistics.viewCount)}
+</View>
+
 <View style={{flexDirection:'row',alignItems:'center'}}>
 <Text style={{color:'white'}}>Add to favourites </Text>
-<Icon name="favorite" color='#e00' size={25} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
+<Icon name="favorite" color='#e00' size={23} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
 <FastImage
 style={{width:400,height:280,alignSelf:'center'}}

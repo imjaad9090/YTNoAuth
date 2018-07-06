@@ -26,6 +26,7 @@ import Cats from './screens/Cats';
 import Splash from './screens/Splash';
 import TabView from './screens/TabView';
 import Search from './screens/Search';
+import { fromLeft,fromTop,fadeIn,zoomIn,zoomOut,flipY,flipX } from 'react-navigation-transitions';
 
 //AIzaSyAeoJnFtKPTajCvIqNr-TyRruzwRZ1qMsY
 
@@ -130,6 +131,8 @@ const SemiApp = StackNavigator({
   cats : {screen:Cats}
 
 },{
+  transitionConfig: () => fadeIn(400),
+
   initialRouteName:'tabs'
 })
 
@@ -155,6 +158,7 @@ export default App = SwitchNavigator(
     Select: Homestack,
   },
   {
+
     initialRouteName: 'AuthLoading',
   }
 );

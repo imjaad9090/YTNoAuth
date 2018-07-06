@@ -4,7 +4,12 @@ import { View, Text, StyleSheet,BackHandler,AppState} from 'react-native';
 import { Button } from 'native-base';
 import WebView from 'react-native-android-fullscreen-webview-video';
 const WEBVIEW_REF = 'webview';
-
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+  } from 'react-native-admob'
 // create a component
 class WView extends Component {
 
@@ -27,13 +32,20 @@ class WView extends Component {
 
         this.state={
             appstate: AppState.currentState,
+            showad:false,
         vidstate:true
         }
     }
 
+   
+    switchad(){
+        this.setState({showad:true})
+    }
+
 
    componentDidMount(){
-    AppState.addEventListener('change', this._handleAppStateChange);
+    setTimeout(() => { this.setState({showad: true}); }, 10000)
+          AppState.addEventListener('change', this._handleAppStateChange);
 
    }
    componentWillUnmount(){
@@ -80,13 +92,28 @@ class WView extends Component {
             <View style={styles.container}>
         
         {this.state.vidstate ? 
-        (<WebView
+        (
+        <WebView
             ref={WEBVIEW_REF}
         source={{uri: 'https://www.youtube.com/watch?v='+this.state.videoid}}
       />
       
+      
      )  :null
         }
+      
+      {this.state.showad ? 
+      (
+        <View style={{position:'absolute',alignSelf:'center',justifyContent:'flex-end',bottom:0}}>
+        <AdMobBanner
+        adSize="smartBannerLandscape"
+        adUnitID="ca-app-pub-9592011956917491/8683582684"
+        testDevices={[AdMobBanner.simulatorId]}
+        onAdFailedToLoad={error => console.log(error)}
+        />
+        </View>
+      ) : null
+      }
       
       
         </View>

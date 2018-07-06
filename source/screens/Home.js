@@ -54,7 +54,9 @@ class Home extends Component {
 
     async componentDidMount(){
     var res = await AsyncStorage.getItem('categories')
-
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
     var final = JSON.parse(res)
     console.log(final)
         //this.setState({ids:final})
@@ -65,7 +67,7 @@ class Home extends Component {
     var name =[]
         for(let j=0;j<this.state.items.length;j++){
             if(final.includes(this.state.items[j].id)){
-                name.push(current[j].name)
+                name.push(capitalize(current[j].name))
                 current[j].added = true
             }
 

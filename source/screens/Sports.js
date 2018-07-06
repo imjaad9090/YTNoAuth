@@ -4,6 +4,7 @@ import { View, Text, StyleSheet,FlatList,Image,AppState,TextInput,ToastAndroid,N
 import FastImage from 'react-native-fast-image'
 import { DrawerActions } from 'react-navigation';
 import { NavigationActions } from 'react-navigation';
+var numeral = require('numeral');
 searchURL = "http://suggestqueries.google.com/complete/search?client=chrome&q=";
 var parseString = require('react-native-xml2js').parseString
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
@@ -12,7 +13,7 @@ import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const SEARCH = 'http://clients1.google.com/complete/search?hl=en&output=toolbar&gl=us&ds=yt&q=?'
 var Spinner = require('react-native-spinkit');
-const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
+const LINK = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='
 import {
     AdMobBanner,
     AdMobInterstitial,
@@ -196,7 +197,13 @@ if (Platform.OS === 'android'){
       
         var ans= (hours * 3600 + minutes * 60 + seconds)/60;
         var ddew = ans.toFixed(0);
-        return <Text style={{color:'red'}}>{ddew} minutes</Text>
+        return <Text style={{color:'#b2bec3',marginHorizontal:3}}>{ddew} minutes </Text>
+      }
+
+      showViews(props){
+        var string = numeral(props).format('0,0');
+        return <Text style={{color:'#b2bec3',marginHorizontal:3}}> {string} views </Text>
+
       }
 
 
@@ -311,7 +318,7 @@ if (Platform.OS === 'android'){
 
             if(this.state.nextPageToken != 'null'){
             
-            axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,player,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
+            axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&maxResults=10&key=AIzaSyBzyI8GzavsFfFoxopFLCAApWM2VKRXNeo&chart=mostPopular&regionCode=us&videoCategoryId='+this.state.catID+'&pageToken='+ this.state.nextPageToken)
           .then((response) => {
            
             console.log(response);
@@ -459,12 +466,20 @@ onEndReached={this.onEndReached.bind(this)}
 //extraData={this.state.index}
 renderItem={({item}) => (
   <View style={{marginVertical:10}}>
-<Text style={{color:'white',fontWeight:"600"}}>{item.snippet.localized.title}</Text>
+<Text style={{color:'white',fontWeight:"400",fontSize:16}}>{item.snippet.localized.title}</Text>
 <Text style={{color:'white'}}>{item.snippet.channelTitle}</Text>
+
+
+<View style={{flexDirection:'row',alignItems:'center'}}>
+<Icon name="play-circle-outline" style={{marginLeft:3}} color="#e00" size={16} /> 
 {this.showTime(item.contentDetails.duration)}
+<Icon name="remove-red-eye" style={{marginLeft:3}} color="#e00" size={16} /> 
+
+{this.showViews(item.statistics.viewCount)}
+</View>
 <View style={{flexDirection:'row',alignItems:'center'}}>
 <Text style={{color:'white'}}>Add to favourites </Text>
-<Icon name="favorite" color='#e00' size={25} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
+<Icon name="favorite" color='#e00' size={23} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
 <TouchableOpacity activeOpacity={0.9} onPress={()=>this.openWebview(item.id)}>
 <FastImage
