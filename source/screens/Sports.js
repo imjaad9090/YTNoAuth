@@ -4,6 +4,7 @@ import { View, Text, StyleSheet,FlatList,Image,AppState,TextInput,ToastAndroid,N
 import FastImage from 'react-native-fast-image'
 import { DrawerActions } from 'react-navigation';
 import { NavigationActions } from 'react-navigation';
+import TimeAgo from "react-native-timeago";
 var numeral = require('numeral');
 searchURL = "http://suggestqueries.google.com/complete/search?client=chrome&q=";
 var parseString = require('react-native-xml2js').parseString
@@ -63,6 +64,7 @@ class Sports extends Component {
         //this.focusTextInput = this.focusTextInput.bind(this);
 
         this.state={
+            showcancel:false,
             showad:true,
             loading:false,
             //sendfunc:undefined,
@@ -119,10 +121,10 @@ class Sports extends Component {
         console.log('tab focued')
     })
 
-
+ 
     this.props.navigation.setParams({
         headerRight: (
-            <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5,padding:15,}} size={26} color="#fff" onPress={()=>this.toggle()} /></View>
+            <View style={{flexDirection:'row',paddingHorizontal:5}}><Icon name="search"  style={{marginHorizontal:5,paddingHorizontal:15,}} size={26} color="#fff" onPress={()=>this.toggle()} /></View>
         )
       })
 
@@ -273,7 +275,19 @@ if (Platform.OS === 'android'){
 
 
       search(props){
+
+        console.log(props)
+        this.setState({currentInput:props})
+
+
+        if(props.length < 1){
+            this.setState({searchRes:[],currentInput:undefined,showcancel:false})
+        }
+
+       
+        
         if(props.length > 3){
+            this.setState({showcancel:true})
             axios.get(SEARCH+props)
             .then((response) => {
                 var str = (response.data)
@@ -347,6 +361,17 @@ if (Platform.OS === 'android'){
             clearInterval(this.sendfunc)
         }
 
+        onSubmit(){
+            console.log(this.state.currentInput)
+            if(this.state.currentInput != undefined){
+                this.setState({searchRes:[]})
+            this.props.navigation.navigate('search',{query:JSON.stringify(this.state.currentInput)})
+        }}
+        clearInput(){
+            this.textInputRef.clear()
+            this.setState({currentInput:undefined,showcancel:false})
+        }
+
     render() {
 
         return (
@@ -382,43 +407,56 @@ if (Platform.OS === 'android'){
     
     
     {this.state.searchToggle ?  
-    (<Animatable.View   animation="fadeIn" duration={200} easing="ease-in" style={{width:'100%',padding:5,paddingHorizontal:10,position:"relative",
+    (<Animatable.View   animation="fadeIn" duration={400} easing="ease-in" style={{width:'100%',padding:5,paddingHorizontal:10,position:"relative",alignItems:"center",
            
-           height:'10%',borderColor:'transparent',backgroundColor:'#7b050b',}}>
+        height:'10%',flexDirection:'row',borderColor:'transparent',backgroundColor:'#dd0914',}}>
        
-       <View style={{flex:1,flexDirection:'row',backgroundColor:'#dd0914',
-           borderRadius:4,alignItems:'center'}}>
-       <View style={{justifyContent:'center',paddingLeft:2}}>
-       <Icon name='search' color='white' size={22} />
+       <View style={{justifyContent:'center',paddingHorizontal:2}}>
+       <Icon name='youtube-searched-for' color='white' size={25} />
 
        </View>
+
+
+       <View style={{flex:1,backgroundColor:'#fff',
+           borderRadius:2,height:'75%',justifyContent:'center',}}>
+       
        <TextInput  
-          //ref={(input) => { this.textInput = input }} 
+        ref={ref => this.textInputRef = ref}
         autoFocus={true}
         placeholder="Search"
         onTouchStart={()=> this.setState({searchRes:[]})}
-      selectionColor={'white'}
+      selectionColor="#a5b1c2"
+      returnKeyType="search"
+      textBreakStrategy="highQuality"
        underlineColorAndroid='transparent'
        autoCorrect={false}
+       blurOnSubmit={true}
+       onSubmitEditing={()=>this.onSubmit()}
        //autoCapitalize='none'
        placeholderTextColor="#bfbfbf"
        onChangeText={(text)=>this.search(text)}
-       placeholder=''
-       style={{height:'100%',
+       placeholder='Search Youtube..'
+       style={{height:100,
        justifyContent:'center',
            textDecorationLine:'none',
            textDecorationColor:'transparent',
-           color:'white',
+           color:'black',
            fontWeight:'400',
            alignItems:'center',
            width:'100%',
-           position:'relative',
+           //position:'relative',
            fontStyle:'normal',
-           fontSize:16,
+           fontSize:14,
               
        }} />
        </View>
-      
+
+      {this.state.showcancel ? ( 
+       <View style={{justifyContent:'center',paddingLeft:2}}>
+       <Icon name='cancel' color='white' size={25} onPress={()=>this.clearInput()} />
+
+       </View>) : null
+       }
        </Animatable.View>) : null
     }
 
@@ -467,12 +505,17 @@ onEndReached={this.onEndReached.bind(this)}
 renderItem={({item}) => (
   <View style={{marginVertical:10}}>
 <Text style={{color:'white',fontWeight:"400",fontSize:16}}>{item.snippet.localized.title}</Text>
-<Text style={{color:'white'}}>{item.snippet.channelTitle}</Text>
+<Text style={{color:'white',fontWeight:'500',color:'#b11'}}>{item.snippet.channelTitle}</Text>
 
 
 <View style={{flexDirection:'row',alignItems:'center'}}>
-<Icon name="play-circle-outline" style={{marginLeft:3}} color="#e00" size={16} /> 
-{this.showTime(item.contentDetails.duration)}
+
+{/*<Icon name="play-circle-outline" style={{marginLeft:3}} color="#e00" size={16} /> 
+{this.showTime(item.contentDetails.duration)}*/}
+<Icon name="access-time" style={{marginLeft:3}} color="#e00" size={16} /> 
+<Text style={{color:'#b2bec3',marginHorizontal:3}}><TimeAgo time={`${item.snippet.publishedAt}`} /></Text>
+
+
 <Icon name="remove-red-eye" style={{marginLeft:3}} color="#e00" size={16} /> 
 
 {this.showViews(item.statistics.viewCount)}
@@ -482,6 +525,8 @@ renderItem={({item}) => (
 <Icon name="favorite" color='#e00' size={23} onPress={()=>this.addChannel(item.snippet.channelId,item.id)}/>
 </View>
 <TouchableOpacity activeOpacity={0.9} onPress={()=>this.openWebview(item.id)}>
+<View>
+    
 <FastImage
 style={{width:400,height:280,alignSelf:'center'}}
 source={{
@@ -490,7 +535,8 @@ priority: FastImage.priority.normal,
 
 }}
 resizeMode={FastImage.resizeMode.contain}
-/>
+    />
+    </View>
 </TouchableOpacity>
 
   </View>

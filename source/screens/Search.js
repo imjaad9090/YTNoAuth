@@ -5,7 +5,7 @@ import FastImage from 'react-native-fast-image'
 import { DrawerActions } from 'react-navigation';
 import { NavigationActions } from 'react-navigation';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
-const Q = 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyCEnFIC4sQYCrsL03GufcD1xw2JHaQmxUs&part=snippet&order=date&type=video&maxResults=50&regionCode=us&q=?'
+const Q = 'https://www.googleapis.com/youtube/v3/search?key=AIzaSyCEnFIC4sQYCrsL03GufcD1xw2JHaQmxUs&part=snippet&order=date&type=video&maxResults=50&regionCode=US&q=?'
 import axios from 'react-native-axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
