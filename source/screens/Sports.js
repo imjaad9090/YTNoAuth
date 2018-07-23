@@ -108,9 +108,13 @@ class Sports extends Component {
     
 
    async componentDidMount(){
-    this.sendfunc = setInterval(()=> this.showAdView(), 40000)
 
-    this.props.navigation.addListener('willBlur', (route) => { 
+    /*this.showAdView()
+
+
+    this.sendfunc = setInterval(()=> this.showAdView(), 40000)*/
+
+   {/* this.props.navigation.addListener('willBlur', (route) => { 
         //console.log('tab blurred')
         this.clearAds()
 
@@ -120,7 +124,7 @@ class Sports extends Component {
        this.setState({showad:true})
         console.log('tab focued')
     })
-
+*/}
  
     this.props.navigation.setParams({
         headerRight: (

@@ -53,6 +53,8 @@ class Home extends Component {
 
 
     async componentDidMount(){
+        this.showAd()
+
     var res = await AsyncStorage.getItem('categories')
     function capitalize(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -206,7 +208,6 @@ async submit(){
     
     this.showAd()
 
-
     const { navigate } = this.props.navigation;
 
     if(this.state.ids.length == 3){
@@ -251,7 +252,7 @@ async submit(){
          
           
           <TouchableOpacity  activeOpacity={1.0} style={[styles.itemContainer, { backgroundColor: 'black'}]} onPress={()=>this.addList(item.id)}>
-          <ImageOverlay source={item.source} overlayColor="#000" overlayAlpha={0.5} 
+          <ImageOverlay source={item.source} overlayColor="#000" overlayAlpha={0.4} 
           containerStyle={{width:'100%',display:'flex',position:'relative',
           height:'100%',borderRadius:2,justifyContent:'center',alignItems:'center'
           }} resizeMode="cover">
